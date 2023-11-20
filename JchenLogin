@@ -1,0 +1,91 @@
+package edu.gatech.cs6310.group33.GroceryExpressService.Security;
+
+import java.util.*;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.Statement;
+
+ 
+public class Login {
+    private static String username;
+    private static String password;
+    private static String role;
+    private static String url = "jdbc:postgresql://db:5432/postgres";
+    private static String user = "postgres";
+    private static String pass = "example";
+    private static Connection con;
+    static Scanner input = new Scanner(System.in);
+
+    public static void main() throws Exception {
+
+            Class.forName("com.postgresql.jdbc.Driver");
+            con = DriverManager.getConnection(url, user, pass);
+            System.out.println(" 1:Login\n 2：Registration");
+
+            int i = input.nextInt();
+            switch (i) {
+                case 1:
+                    Login();
+                    break;
+                case 2:
+                    Registration();
+                    break;
+                default:
+                    System.out.println("Wrong Input");
+                    System.exit(0);
+            }
+
+        }
+
+    public static void registration() throws SQLException {
+            System.out.println("Please input your username: ");
+            username = input.next();
+            System.out.println("Please input your password: ");
+            String p1 = input.next();
+            System.out.println("RE");
+            String p2 = input.next();
+            if (p1.equals(p2)) {
+                password = p1;
+                String sql = "insert into user_info (username,password) values(?,?)";
+                PreparedStatement pps = con.prepareStatement(sql);
+                pps.setString(1, username);
+                pps.setString(2, password);
+                pps.execute();
+                System.out.println("Successfully\nLogin: ");
+                Login();
+            } else {
+                System.out.println("The passwords are not matched.");
+                registration();
+            }
+
+        }
+
+         
+    public static void login() throws SQLException{
+    
+            System.out.println("Input UserID: ");
+            username = input.next();
+            System.out.println("Input Password: ");
+            password = input.next();
+             
+            String sql = "select username,password,role from user_info where username=? and password=?";
+            PreparedStatement pps = con.prepareStatement(sql);
+            pps.setString(1, username);
+            pps.setString(2, password);
+            ResultSet rs = pps.executeQuery();
+               
+            if (rs.next()) {
+                System.out.println("Login Successfully！");
+               } else {
+                   System.out.println("Wrong username or password");
+                    login();
+                    }
+             
+       }
+   }
+     
+   
+    
+    
+    
